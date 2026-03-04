@@ -1,0 +1,9 @@
+.git
+.gitignore
+data/
+tmp/
+.env
+*.exe
+*.db
+*.db-journal
+*.db-wal

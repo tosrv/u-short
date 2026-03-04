@@ -1,0 +1,42 @@
+{{define "layout"}}
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/static/htmx.min.js"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link rel="stylesheet" href="/static/css/style.css" />
+
+    <title>U-Short</title>
+  </head>
+  <body>
+    {{template "navbar" .}}
+
+    <main
+      class="min-h-screen flex justify-center items-center bg-[url('/static/img/hero.jpg')] bg-cover bg-center bg-no-repeat p-4 pt-20"
+    >
+      {{block "content" .}} {{end}}
+    </main>
+
+    {{template "footer" .}}
+    <script src="../static/js/script.js"></script>
+    <script>
+      window.notyf = new Notyf({
+        duration: 2000,
+        position: { x: "right", y: "bottom" },
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </body>
+</html>
+{{end}}

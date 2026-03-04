@@ -1,0 +1,12 @@
+{{define "scan-qr"}}
+<div class="flex flex-col items-center gap-1">
+  <img src="data:image/png;base64,{{.}}" class="w-40 h-40 object-contain" />
+  <a
+    href="data:image/png;base64,{{.}}"
+    download="qrcode.png"
+    class="bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg text-white font-bold text-sm transition-all flex items-center"
+  >
+    <i class="fa-solid fa-angles-down"></i> Download
+  </a>
+</div>
+{{end}}

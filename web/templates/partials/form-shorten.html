@@ -1,0 +1,49 @@
+{{define "form-shorten"}}
+<form
+  hx-post="/shorten"
+  hx-target="#form-area"
+  hx-swap="innerHTML"
+  class="space-y-4"
+>
+  <div>
+    <input type="hidden" name="type" value="shorten" />
+
+    <label class="text-white font-semibold">Paste your long URL</label>
+    <input
+      type="url"
+      name="url"
+      required
+      pattern="https?://.*"
+      title="Must include http:// or https://"
+      placeholder="https://long-url.com"
+      class="w-full h-14 bg-gray-800 rounded-2xl p-2.5 text-white placeholder-gray-500 invalid:text-red-500 focus:ring-none focus:outline-none"
+      _="on input
+      if my.value.endWith('/')
+      set my.value to my.value.slice(0, -1)"
+    />
+  </div>
+  <div>
+    <label class="text-white font-semibold">Custom Alias (Optional)</label>
+    <input
+      type="text"
+      name="code"
+      placeholder="u-short"
+      pattern="[a-zA-Z0-9]{1,8}"
+      title="Max 8 characters, only letters and numbers allowed"
+      class="w-full h-14 bg-gray-800 rounded-2xl p-2.5 text-white invalid:text-red-500 focus:ring-none focus:outline-none"
+      _="on input
+      if my.value.length > 8
+        set my.value to my.value.slice(0, 8)
+      end"
+    />
+  </div>
+  <div class="flex justify-center">
+    <button
+      type="submit"
+      class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-2xl transition"
+    >
+      <i class="fa-solid fa-link-slash"></i> Shorten URL
+    </button>
+  </div>
+</form>
+{{end}}

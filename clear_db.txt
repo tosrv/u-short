@@ -1,0 +1,27 @@
+package main
+
+import (
+	"fmt"
+	"u-short/internal/config"
+	"u-short/internal/db"
+	"u-short/internal/model"
+)
+
+func main() {
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Println(err)
+	}
+	database := db.InitDB(cfg.DbUrl)
+
+	result := database.Unscoped().Where("1 = 1").Delete(&model.Url{})
+
+	if result.Error != nil {
+		fmt.Println("Failed to delete data:", result.Error)
+		return
+	}
+
+	database.Exec("DELETE FROM sqlite_sequence WHERE name = 'urls'")
+
+	fmt.Printf("✅ Success! %d row deleted.\n", result.RowsAffected)
+}

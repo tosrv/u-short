@@ -1,0 +1,130 @@
+{{define "result-shorten"}}
+<div class="space-y-4 p-6 bg-gray-900 rounded-2xl">
+  <div>
+    <label class="text-white font-semibold text-sm">Original Url</label>
+    <input
+      type="text"
+      readonly
+      value="{{.OriginalUrl}}"
+      class="w-full h-14 bg-gray-700 rounded-2xl p-4 text-gray-400 focus:outline-none mt-1"
+    />
+  </div>
+
+  <div>
+    <label class="text-white font-semibold text-sm">Short Url</label>
+    <div class="relative mt-1">
+      <input
+        type="text"
+        readonly
+        id="short-url-input"
+        value="{{.ShortLink}}"
+        class="w-full h-14 bg-gray-700 rounded-2xl p-4 text-green-400 font-semibold focus:outline-none pr-16"
+      />
+      <button
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-400 transition-colors"
+        _="on click 
+        call navigator.clipboard.writeText('{{.ShortLink}}') 
+        then add .fa-check .text-green-500 to <i/> in me
+        then remove .fa-clone from <i/> in me
+        then call window.notyf.success('Copied to clipboard!')
+        then wait 1.5s 
+        then add .fa-clone to <i/> in me
+        then remove .fa-check .text-green-500 from <i/> in me"
+        title="Copy to clipboard"
+      >
+        <i class="fa-solid fa-clone text-xl"></i>
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="flex justify-center items-center gap-3 pt-2 text-white font-bold text-sm text-center"
+  >
+    <a
+      href="{{.ShortLink}}"
+      target="_blank"
+      class="hidden md:block bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg"
+    >
+      Open <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+    </a>
+    <button
+      class="hidden md:block bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg"
+      _="on click
+     if navigator.share
+       call navigator.share({
+         title: 'U-Short',
+         text: 'Check out this short link!',
+         url: '{{.ShortLink}}'
+       })
+     else
+       call Swal.fire({
+         title: 'Share Link',
+         html: `
+           <div class='flex justify-center gap-6 p-4'>
+             <a href='https://wa.me/?text=Cek link ini: {{.ShortLink}}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
+               <i class='fa-brands fa-whatsapp fa-2xl'></i>
+             </a>
+             <a href='https://twitter.com/intent/tweet?url={{.ShortLink}}' target='_blank' class='text-blue-400 hover:scale-110 transition-transform'>
+               <i class='fa-brands fa-twitter fa-2xl'></i>
+             </a>
+             <a href='https://t.me/share/url?url={{.ShortLink}}' target='_blank' class='text-blue-500 hover:scale-110 transition-transform'>
+               <i class='fa-brands fa-telegram fa-2xl'></i>
+             </a>
+           </div>
+         `,
+         showConfirmButton: false,
+         showCloseButton: true,
+         background: '#1f2937',
+         color: '#fff'
+       })
+     end"
+    >
+      <i class="fa-solid fa-share-nodes"></i> Share
+    </button>
+    <div class="relative">
+      <button
+        hx-post="/scan"
+        hx-vals='{"url": "{{.ShortLink}}"}'
+        hx-target="#qr-content"
+        hx-trigger="click once"
+        class="hidden md:block bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg"
+        _="on click halt
+        on click remove .hidden from #qr-tooltip"
+      >
+        <i class="fa-solid fa-qrcode"></i> QR
+      </button>
+
+      <div
+        id="qr-tooltip"
+        class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-4 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+        _="on click from document add .hidden to me"
+      >
+        <div
+          class="bg-white p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] border border-gray-100 flex flex-col items-center min-w-[180px]"
+        >
+          <div
+            class="absolute top-full left-1/2 -translate-x-1/2 border-10 border-transparent border-t-white"
+          ></div>
+
+          <div
+            id="qr-content"
+            class="w-45 h-full flex items-center justify-center text-gray-400"
+          >
+            <i
+              class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-500"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button
+      hx-get="/partials/form-shorten"
+      hx-target="#form-area"
+      class="border border-gray-700 py-2 px-4 rounded-xl text-gray-400 text-sm hover:bg-gray-800"
+    >
+      Generate Another
+    </button>
+  </div>
+</div>
+{{end}}

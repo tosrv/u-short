@@ -1,0 +1,14 @@
+{{define "navbar"}}
+<header class="fixed top-0 w-full backdrop-blur-md border-b border-gray-100/10 z-50">
+  <nav class="container mx-auto p-2 flex justify-between items-center">
+    <h1 class="font-bold text-xl text-green-500">U-Short</h1>
+    
+    <button 
+      _="on click send openDrawer to #historyDrawer then trigger renderHistory on #historyList"
+      class="text-sm font-bold text-gray-800 hover:text-green-500 transition-colors">
+      History
+    </button>
+  </nav>
+  {{template "side-drawer" .}}
+</header>
+{{end}}

@@ -1,0 +1,40 @@
+{{template "layout" .}} {{define "content"}}
+<div class="w-full">
+  <div
+    id="tab-container"
+    class="w-full max-w-5xl mx-auto backdrop-blur-md rounded-2xl flex flex-col items-center"
+  >
+    <div class="grid grid-cols-2 w-full">
+      <span
+        id="btn-shorten"
+        hx-get="/partials/form-shorten"
+        hx-target="#form-area"
+        class="text-xl font-semibold w-full rounded-t-2xl h-12 border-4 border-green-600 border-b-0 text-center py-2 cursor-pointer"
+        _="on click add .border-b-4 .bg-gray-600 to <span/> then remove .border-b-4 .bg-gray-600 from me then take .border-b-0 .border-4 from <span/>"
+      >
+        <i class="fa-solid fa-link-slash"></i> Shorten
+      </span>
+
+      <span
+        id="btn-qr"
+        hx-get="/partials/form-qr"
+        hx-target="#form-area"
+        class="text-xl font-semibold w-full rounded-t-2xl h-12 bg-gray-600 border-b-4 border-green-600 text-center py-2 cursor-pointer"
+        _="on click add .border-b-4 .bg-gray-600 to <span/> then remove .border-b-4 .bg-gray-600 from me then take .border-b-0 .border-4 from <span/>"
+      >
+        <i class="fa-solid fa-qrcode"></i> QR Code
+      </span>
+    </div>
+
+    <div
+      class="flex flex-1 items-center justify-center w-full p-4 border-4 border-green-600 border-t-0 rounded-b-2xl min-h-96"
+    >
+      <div id="form-area" class="w-full px-4">
+        {{template "form-shorten" .}}
+      </div>
+    </div>
+  </div>
+
+  {{template "history" .}}
+</div>
+{{end}}

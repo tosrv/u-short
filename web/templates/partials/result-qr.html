@@ -1,0 +1,93 @@
+{{define "result-qr"}}
+<div
+  class="flex flex-wrap justify-around items-center p-6 bg-gray-900 rounded-2xl gap-4 overflow-hidden"
+>
+  <div class="flex flex-col justify-center items-center">
+    <div class="bg-white p-3 rounded-xl shadow-2xl mb-4">
+      <img src="data:image/png;base64,{{.QRCode}}" class="w-40 h-40" />
+    </div>
+
+    <div class="mb-6 flex flex-col items-center">
+      <p class="text-xs text-gray-500 truncate mb-1 w-full max-w-[60vw]">
+        {{.OriginalUrl}}
+      </p>
+      <div class="flex items-center justify-center gap-2">
+        <p class="text-green-400 font-semibold">{{.ShortLink}}</p>
+        <button
+          class="text-gray-700 hover:text-green-400 transition-colors"
+          _="on click 
+        call navigator.clipboard.writeText('{{.ShortLink}}') 
+        then add .fa-check .text-green-500 to <i/> in me
+        then remove .fa-clone from <i/> in me
+        then call window.notyf.success('Copied to clipboard!')
+        then wait 1.5s 
+        then add .fa-clone to <i/> in me
+        then remove .fa-check .text-green-500 from <i/> in me"
+          title="Copy to clipboard"
+        >
+          <i class="fa-solid fa-clone"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <a
+      href="{{.ShortLink}}"
+      target="_blank"
+      class="bg-green-500 hover:bg-green-600 py-2 rounded-lg text-white font-bold text-sm text-center"
+    >
+      Open <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+    </a>
+    <button
+      class="bg-green-500 hover:bg-green-600 py-2 rounded-lg text-white font-bold text-sm text-center"
+      _="on click 
+        if navigator.share
+          call navigator.share({
+            title: 'Shorten Link',
+            text: 'Check out this short link!',
+            url: '{{.ShortLink}}'
+          })
+          then log 'Shared successfully'
+        else
+          call Swal.fire({
+         title: 'Share Link',
+         html: `
+           <div class='flex justify-center gap-6 p-4'>
+             <a href='https://wa.me/?text=Cek link ini: {{.ShortLink}}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
+               <i class='fa-brands fa-whatsapp fa-2xl'></i>
+             </a>
+             <a href='https://twitter.com/intent/tweet?url={{.ShortLink}}' target='_blank' class='text-blue-400 hover:scale-110 transition-transform'>
+               <i class='fa-brands fa-twitter fa-2xl'></i>
+             </a>
+             <a href='https://t.me/share/url?url={{.ShortLink}}' target='_blank' class='text-blue-500 hover:scale-110 transition-transform'>
+               <i class='fa-brands fa-telegram fa-2xl'></i>
+             </a>
+           </div>
+         `,
+         showConfirmButton: false,
+         showCloseButton: true,
+         background: '#1f2937',
+         color: '#fff'
+       })
+        end"
+    >
+      <i class="fa-solid fa-share-nodes"></i> Share
+    </button>
+    <a
+      href="data:image/png;base64,{{.QRCode}}"
+      download="qr-code.png"
+      class="bg-green-500 hover:bg-green-600 py-2 rounded-lg text-white font-bold text-center text-sm"
+    >
+      <i class="fa-solid fa-angles-down"></i> Download
+    </a>
+    <button
+      hx-get="/partials/form-qr"
+      hx-target="#form-area"
+      class="border border-gray-700 px-15 py-2 rounded-lg text-gray-400 text-sm text-center hover:bg-gray-800"
+    >
+      Generate Another
+    </button>
+  </div>
+</div>
+{{end}}

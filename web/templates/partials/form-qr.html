@@ -1,0 +1,31 @@
+{{define "form-qr"}}
+<form
+  hx-post="/shorten"
+  hx-target="#form-area"
+  hx-swap="innerHTML"
+  class="space-y-4"
+>
+  <div>
+    <input type="hidden" name="type" value="qr" />
+
+    <label class="text-white font-semibold">Enter URL for QR Code</label>
+    <input
+      type="url"
+      name="url"
+      required
+      pattern="https?://.*"
+      title="Must include http:// or https://"
+      placeholder="https://long-url.com"
+      class="w-full h-14 bg-gray-800 rounded-2xl p-2.5 text-white placeholder-gray-500 invalid:text-red-500 focus:ring-none focus:outline-none"
+    />
+  </div>
+  <div class="flex justify-center">
+    <button
+      type="submit"
+      class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-2xl transition"
+    >
+      <i class="fa-solid fa-qrcode"></i> Generate QR Code
+    </button>
+  </div>
+</form>
+{{end}}
