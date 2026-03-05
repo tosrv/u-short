@@ -1,11 +1,22 @@
 {{define "navbar"}}
-<header class="fixed top-0 w-full backdrop-blur-md border-b border-gray-100/10 z-50">
-  <nav class="container mx-auto p-2 flex justify-between items-center">
-    <h1 class="font-bold text-xl text-green-500">U-Short</h1>
-    
-    <button 
+<header class="fixed top-0 w-full p-4 z-50">
+  <nav
+    class="backdrop-blur-md bg-green-100/10 shadow-sm container mx-auto py-4 px-10 border border-green-300/30 rounded-2xl flex justify-between items-center"
+  >
+    <h1 class="font-bold text-xl text-green-500">
+      <a href="javascript:void(0)" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-link-slash"></i> U-Short </a>
+    </h1>
+
+    <div class="flex gap-4 font-bold text-gray-800 transition-colors">
+      <a href="#features" class="hover:text-green-500">Features</a>
+      <a href="#works" class="hover:text-green-500">How It Works</a>
+      <a href="#faq" class="hover:text-green-500">FAQ</a>
+    </div>
+
+    <button
       _="on click send openDrawer to #historyDrawer then trigger renderHistory on #historyList"
-      class="text-sm font-bold text-gray-800 hover:text-green-500 transition-colors">
+      class="font-bold text-gray-800 hover:text-green-500 transition-colors cursor-pointer"
+    >
       History
     </button>
   </nav>

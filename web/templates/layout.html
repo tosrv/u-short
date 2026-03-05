@@ -4,32 +4,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
     <script src="/static/htmx.min.js"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
     <link rel="stylesheet" href="/static/css/style.css" />
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif !important;
+      }
+    </style>
 
     <title>U-Short</title>
   </head>
   <body>
     {{template "navbar" .}}
 
-    <main
-      class="min-h-screen flex justify-center items-center bg-[url('/static/img/hero.jpg')] bg-cover bg-center bg-no-repeat p-4 pt-20"
-    >
-      {{block "content" .}} {{end}}
-    </main>
+    <main>{{block "content" .}} {{end}}</main>
 
     {{template "footer" .}}
-    <script src="../static/js/script.js"></script>
+    <script src="/static/js/script.js"></script>
     <script>
       window.notyf = new Notyf({
         duration: 2000,

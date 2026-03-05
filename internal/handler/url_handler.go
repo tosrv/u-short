@@ -29,7 +29,14 @@ func NewUrlHandler(svc *service.UrlService) *UrlHandler {
 
 // Render Layout HTML
 func (h *UrlHandler) Index(w http.ResponseWriter, r *http.Request) {
-	err := h.tmpl.ExecuteTemplate(w, "layout", nil)
+	links, clicks := h.svc.GetStats(r.Context())
+
+	data := map[string]interface{}{
+		"Links":  links,
+		"Clicks": clicks,
+	}
+
+	err := h.tmpl.ExecuteTemplate(w, "layout", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -1,168 +1,193 @@
 {{define "history"}}
-<div class="max-w-5xl mx-auto mt-10">
-  <div class="w-full flex justify-start">
-    <h2 class="text-center text-2xl font-bold">
-      Recently Shortened
-    </h2>
-  </div>
-  <div
-    id="history-list"
-    class="flex flex-col bg-green-50 rounded-2xl p-4 shadow-sm"
-    _="on load or linkCreated from body 
-        set my.innerHTML to '' 
-        set raw to localStorage.getItem('u_short_history') 
-        
-        if raw is null or raw is '[]' 
-           put `<p class='text-center text-gray-600'>No shortened yet</p>` into me 
-           halt
-        end
-
-        set history to JSON.parse(raw) 
-        set latestHistory to history.slice(0, 3) 
-           for item in latestHistory 
-             set fragment to #history-row-template.content.cloneNode(true)
-             put item.short into fragment.querySelector('.short-url')
-             put item.original into fragment.querySelector('.original-url')
-             set qrBtn to fragment.querySelector('.qr-btn')
-             set dbId to item.id
-             set qrContent to fragment.querySelector('.qr-content')
-             set uniqId to 'qr-' + dbId
-             set qrContent.id to uniqId
-             set shortUrl to item.short
-             set vals to 'js:{url: `'+shortUrl+'`}'
-             call qrBtn.setAttribute('hx-post', '/scan')
-             call qrBtn.setAttribute('hx-vals', vals)
-             call qrBtn.setAttribute('hx-target', '#' + uniqId)
-             call qrBtn.setAttribute('hx-trigger', 'click once')
-             set row to fragment.firstElementChild
-             call my.appendChild(row)
-             call htmx.process(row)
-           end 
-       end
-
-     on click 
-        set btn to target.closest('.copy-btn')
-        if btn
-          set row to btn.closest('.flex-col')
-          set textToCopy to (row.querySelector('.short-url')).innerText
-          call navigator.clipboard.writeText(textToCopy)
-          call btn.querySelector('.icon').classList.remove('fa-clone')
-          call btn.querySelector('.icon').classList.add('fa-check', 'text-green-500')
-          call window.notyf.success('Copied to clipboard!')
-          then wait 1.5s
-          then call btn.querySelector('.icon').classList.remove('fa-check', 'text-green-500')
-          then call btn.querySelector('.icon').classList.add('fa-clone')
-        end
-        
-        
-        set openBtn to target.closest('.open')
-        if openBtn
-          set row to openBtn.closest('.flex-col')
-          set shortUrl to (row.querySelector('.short-url')).innerText
-          call window.open(shortUrl, '_blank')
-        end
-        
-        set shareBtn to target.closest('.share')
-        if shareBtn
-          set row to shareBtn.closest('.flex-col')
-          set shortUrl to (row.querySelector('.short-url')).innerText
-
-          if navigator.share
-            call navigator.share({
-              title: 'Shorten Link',
-              text: 'Check out this short link!',
-              url: shortUrl
-            })
-            log 'Shared successfully'
-          else
-            call Swal.fire({
-         title: 'Share Link',
-         html: `
-           <div class='flex justify-center gap-6 p-4'>
-             <a href='https://wa.me/?text=Cek link ini: {{.ShortLink}}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
-               <i class='fa-brands fa-whatsapp fa-2xl'></i>
-             </a>
-             <a href='https://twitter.com/intent/tweet?url={{.ShortLink}}' target='_blank' class='text-blue-400 hover:scale-110 transition-transform'>
-               <i class='fa-brands fa-twitter fa-2xl'></i>
-             </a>
-             <a href='https://t.me/share/url?url={{.ShortLink}}' target='_blank' class='text-blue-500 hover:scale-110 transition-transform'>
-               <i class='fa-brands fa-telegram fa-2xl'></i>
-             </a>
-           </div>
-         `,
-         showConfirmButton: false,
-         showCloseButton: true,
-         background: '#1f2937',
-         color: '#fff'
-       })
-          end
-        end
-
-        set qrBtn to target.closest('.qr-btn')
-        if qrBtn
-          add .hidden to .qr-tooltip
-          remove .hidden from qrBtn.nextElementSibling
-        end
-        
-     on click from document 
-     if target.closest('.qr-btn') is null and target.closest('.qr-tooltip') is null
-       add .hidden to .qr-tooltip
-     end"
-  ></div>
-  <template id="history-row-template">
-    <div class="flex flex-col border-b border-green-700 last:border-0 p-3">
-      <div class="flex justify-between items-center">
-        <div class="flex flex-col min-w-0 w-full md:w-1/2 lg:w-full">
-          <div class="flex gap-2 items-center">
-            <p class="text-green-500 font-semibold short-url"></p>
-            <button
-              class="copy-btn text-gray-400 hover:text-green-600"
-              title="Copy to clipboard"
-            >
-              <i class="fa-solid fa-clone pointer-events-none icon"></i>
-            </button>
-          </div>
-          <p class="text-gray-700 text-sm truncate original-url block"></p>
-        </div>
-        <div
-          class="hidden md:flex items-center justify-end gap-4 text-sm text-center text-white font-bold w-[400px]"
-        >
-          <div class="relative">
-            <button
-              class="qr-btn bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg text-white font-bold text-sm text-center qr-btn"
-            >
-              <i class="fa-solid fa-qrcode"></i> QR
-            </button>
-
-            <div
-              class="qr-tooltip hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-4 z-50"
-            >
-              <div
-                class="bg-white p-4 rounded-2xl shadow-xl border flex flex-col items-center min-w-[180px]"
-              >
-                <div
-                  class="qr-content w-45 h-full flex items-center justify-center text-gray-400"
+<div class="w-full my-20 p-6">
+  <div class="max-w-5xl mx-auto flex flex-col gap-20">
+    <div>
+      <h2
+        class="text-4xl md:text-5xl font-black text-gray-900 mb-4 italic text-center tracking-tight"
+      >
+        Recently Shortened
+      </h2>
+      <div
+        id="history-list"
+        class="flex flex-col bg-green-50 rounded-2xl p-4 shadow-sm"
+        _="on load or linkCreated from body 
+            set my.innerHTML to '' 
+            set raw to localStorage.getItem('u_short_history') 
+            
+            if raw is null or raw is '[]' 
+               put `<p class='text-center text-gray-600'>No shortened yet</p>` into me 
+               halt
+            end
+    
+            set history to JSON.parse(raw) 
+            set latestHistory to history.slice(0, 3) 
+               for item in latestHistory 
+                 set fragment to #history-row-template.content.cloneNode(true)
+                 put item.short into fragment.querySelector('.short-url')
+                 put item.original into fragment.querySelector('.original-url')
+                 set qrBtn to fragment.querySelector('.qr-btn')
+                 set dbId to item.id
+                 set qrContent to fragment.querySelector('.qr-content')
+                 set uniqId to 'qr-' + dbId
+                 set qrContent.id to uniqId
+                 set shortUrl to item.short
+                 set vals to 'js:{url: `'+shortUrl+'`}'
+                 call qrBtn.setAttribute('hx-post', '/scan')
+                 call qrBtn.setAttribute('hx-vals', vals)
+                 call qrBtn.setAttribute('hx-target', '#' + uniqId)
+                 call qrBtn.setAttribute('hx-trigger', 'click once')
+                 set row to fragment.firstElementChild
+                 call my.appendChild(row)
+                 call htmx.process(row)
+               end 
+           end
+    
+         on click 
+            set btn to target.closest('.copy-btn')
+            if btn
+              set row to btn.closest('.flex-col')
+              set textToCopy to (row.querySelector('.short-url')).innerText
+              call navigator.clipboard.writeText(textToCopy)
+              call btn.querySelector('.icon').classList.remove('fa-clone')
+              call btn.querySelector('.icon').classList.add('fa-check', 'text-green-500')
+              call window.notyf.success('Copied to clipboard!')
+              then wait 1.5s
+              then call btn.querySelector('.icon').classList.remove('fa-check', 'text-green-500')
+              then call btn.querySelector('.icon').classList.add('fa-clone')
+            end
+            
+            
+            set openBtn to target.closest('.open')
+            if openBtn
+              set row to openBtn.closest('.flex-col')
+              set shortUrl to (row.querySelector('.short-url')).innerText
+              call window.open(shortUrl, '_blank')
+            end
+            
+            set shareBtn to target.closest('.share')
+            if shareBtn
+              set row to shareBtn.closest('.flex-col')
+              set shortUrl to (row.querySelector('.short-url')).innerText
+    
+              if navigator.share
+                call navigator.share({
+                  title: 'Shorten Link',
+                  text: 'Check out this short link!',
+                  url: shortUrl
+                })
+                log 'Shared successfully'
+              else
+                call Swal.fire({
+             title: 'Share Link',
+             html: `
+               <div class='flex justify-center gap-6 p-4'>
+                 <a href='https://wa.me/?text=Cek link ini: {{.ShortLink}}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
+                   <i class='fa-brands fa-whatsapp fa-2xl'></i>
+                 </a>
+                 <a href='https://twitter.com/intent/tweet?url={{.ShortLink}}' target='_blank' class='text-blue-400 hover:scale-110 transition-transform'>
+                   <i class='fa-brands fa-twitter fa-2xl'></i>
+                 </a>
+                 <a href='https://t.me/share/url?url={{.ShortLink}}' target='_blank' class='text-blue-500 hover:scale-110 transition-transform'>
+                   <i class='fa-brands fa-telegram fa-2xl'></i>
+                 </a>
+               </div>
+             `,
+             showConfirmButton: false,
+             showCloseButton: true,
+             background: '#1f2937',
+             color: '#fff'
+           })
+              end
+            end
+    
+            set qrBtn to target.closest('.qr-btn')
+            if qrBtn
+              add .hidden to .qr-tooltip
+              remove .hidden from qrBtn.nextElementSibling
+            end
+            
+         on click from document 
+         if target.closest('.qr-btn') is null and target.closest('.qr-tooltip') is null
+           add .hidden to .qr-tooltip
+         end"
+      ></div>
+      <template id="history-row-template">
+        <div class="flex flex-col border-b border-green-700 last:border-0 p-3">
+          <div class="flex justify-between items-center">
+            <div class="flex flex-col min-w-0 w-full md:w-1/2 lg:w-full">
+              <div class="flex gap-2 items-center">
+                <p class="text-green-500 font-semibold short-url"></p>
+                <button
+                  class="copy-btn text-gray-400 hover:text-green-600"
+                  title="Copy to clipboard"
                 >
-                  <i
-                    class="fa-solid fa-circle-notch animate-spin text-2xl text-green-500"
-                  ></i>
+                  <i class="fa-solid fa-clone pointer-events-none icon"></i>
+                </button>
+              </div>
+              <p class="text-gray-700 text-sm truncate original-url block"></p>
+            </div>
+            <div
+              class="hidden md:flex items-center justify-end gap-4 text-sm text-center text-white font-bold w-[400px]"
+            >
+              <div class="relative">
+                <button
+                  class="qr-btn bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg text-white font-bold text-sm text-center qr-btn"
+                >
+                  <i class="fa-solid fa-qrcode"></i> QR
+                </button>
+
+                <div
+                  class="qr-tooltip hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-4 z-50"
+                >
+                  <div
+                    class="bg-white p-4 rounded-2xl shadow-xl border flex flex-col items-center min-w-[180px]"
+                  >
+                    <div
+                      class="qr-content w-45 h-full flex items-center justify-center text-gray-400"
+                    >
+                      <i
+                        class="fa-solid fa-circle-notch animate-spin text-2xl text-green-500"
+                      ></i>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <button
+                class="bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg share"
+              >
+                <i class="fa-solid fa-share-nodes"></i> Share
+              </button>
+              <button
+                class="bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg open"
+              >
+                Open
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+              </button>
             </div>
           </div>
-          <button
-            class="bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg share"
-          >
-            <i class="fa-solid fa-share-nodes"></i> Share
-          </button>
-          <button
-            class="bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg open"
-          >
-            Open <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-          </button>
         </div>
+      </template>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div
+        class="flex flex-col items-center justify-center gap-2 bg-green-100/50 rounded-2xl border border-green-300 p-6"
+      >
+        <p class="text-4xl font-bold text-green-500">{{.Links}}</p>
+        <p class="uppercase text-sm text-gray-500 font-bold">Links Shortened</p>
+      </div>
+      <div
+        class="flex flex-col items-center justify-center gap-2 bg-green-100/50 rounded-2xl border border-green-300 p-6"
+      >
+        <p class="text-4xl font-bold text-green-500">{{.Clicks}}</p>
+        <p class="uppercase text-sm text-gray-500 font-bold">Links clicks</p>
+      </div>
+      <div
+        class="flex flex-col items-center justify-center gap-2 bg-green-100/50 rounded-2xl border border-green-300 p-6"
+      >
+        <p class="text-4xl font-bold text-green-500">24/7</p>
+        <p class="uppercase text-sm text-gray-500 font-bold">Global uptime</p>
       </div>
     </div>
-  </template>
+  </div>
 </div>
 {{end}}

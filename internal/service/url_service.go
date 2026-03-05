@@ -79,3 +79,9 @@ func (s *UrlService) GetOriginalUrl(ctx context.Context, shortCode string) (stri
 
 	return data.OriginalUrl, nil
 }
+
+func (s *UrlService) GetStats(ctx context.Context) (int64, int64) {
+	links, _ := s.repo.CountLinks(ctx)
+	clicks, _ := s.repo.CountClicks(ctx)
+	return links, clicks
+}

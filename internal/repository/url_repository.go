@@ -44,3 +44,21 @@ func (r *UrlRepository) FindByOriginalUrl(ctx context.Context, originalUrl strin
 func (r *UrlRepository) IncrementClicks(ctx context.Context, shortCode string) error {
 	return r.db.WithContext(ctx).Model(&model.Url{}).Where("short_code = ?", shortCode).Update("clicks", gorm.Expr("clicks + ?", 1)).Error
 }
+
+func (r *UrlRepository) CountLinks(ctx context.Context) (int64, error) {
+    var count int64
+    err := r.db.WithContext(ctx).Model(&model.Url{}).Count(&count).Error
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
+}
+
+func (r *UrlRepository) CountClicks(ctx context.Context) (int64, error) {
+    var total int64
+    err := r.db.WithContext(ctx).Model(&model.Url{}).Select("COALESCE(SUM(clicks), 0)").Scan(&total).Error
+    if err != nil {
+        return 0, err
+    }
+    return total, nil
+}
