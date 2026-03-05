@@ -8,15 +8,16 @@ primary_region = 'sin'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [mounts]
-  source = "u_short_data"
-  destination = "/data"
+  source = 'u_short_data'
+  destination = '/data'
+  processes = ['app']
 
 [env]
-  BASE_URL = "https://u-short.fly.dev/"
+  BASE_URL = 'https://u-short.fly.dev/'
 
 [[vm]]
   memory = '1gb'
