@@ -72,7 +72,7 @@
               if navigator.share
                 call navigator.share({
                   title: 'Shorten Link',
-                  text: 'Check out this short link!',
+                  text: 'Check out this short link: ',
                   url: shortUrl
                 })
                 log 'Shared successfully'
@@ -81,7 +81,7 @@
              title: 'Share Link',
              html: `
                <div class='flex justify-center gap-6 p-4'>
-                 <a href='https://wa.me/?text=Cek link ini: {{.ShortLink}}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
+                 <a href='https://wa.me/?text=Check out this short link: {{.ShortLink}}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
                    <i class='fa-brands fa-whatsapp fa-2xl'></i>
                  </a>
                  <a href='https://twitter.com/intent/tweet?url={{.ShortLink}}' target='_blank' class='text-blue-400 hover:scale-110 transition-transform'>
