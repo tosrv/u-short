@@ -1,18 +1,29 @@
 # --- Build ---
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
-# Install requirement tools SQLite & Tailwind Standalone
-RUN apk add --no-cache gcc musl-dev curl
+# Added libc6-compat for glibc support
+RUN apk add --no-cache gcc musl-dev curl libc6-compat
 
 WORKDIR /app
+
+# Copy and download dependency using go mod
+COPY go.mod go.sum ./
+
+# Download dependency
+RUN go mod download
+
+# Copy the code
 COPY . .
 
-# 1. Download & compile Tailwind CLI
-RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 \
-    && chmod +x tailwindcss-linux-x64 \
-    && ./tailwindcss-linux-x64 -i ./web/static/css/input.css -o ./web/static/css/style.css --minify
+# Download the specific MUSL version for Alpine
+RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64-musl \
+    && chmod +x tailwindcss-linux-x64-musl \
+    && mv tailwindcss-linux-x64-musl /usr/local/bin/tailwindcss
 
-# 2. Build Go (CGO_ENABLED=1 for SQLite)
+# Compile Tailwind
+RUN tailwindcss -i ./web/static/css/input.css -o ./web/static/css/style.css --minify
+
+# Build Go
 RUN CGO_ENABLED=1 GOOS=linux go build -o main ./cmd/server/main.go
 
 # --- Runtime ---
