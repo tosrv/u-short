@@ -1,14 +1,28 @@
 {{define "side-drawer"}}
 <div
   id="historyDrawer"
-  class="fixed right-0 top-0 w-80 md:w-96 bg-white h-screen shadow-2xl translate-x-full transition-transform duration-300 ease-in-out z-60 p-6 flex flex-col"
-  _="on openDrawer remove .translate-x-full 
-    on closeDrawer add .translate-x-full"
+  class="fixed right-0 top-0 w-80 md:w-96 bg-green-50/80 backdrop-blur-xl h-screen shadow-2xl translate-x-full transition-transform duration-300 ease-in-out z-60 p-6 flex flex-col"
+  _="on openDrawer
+      remove .translate-x-full
+      then wait 100
+      add .open
+    end
+
+    on closeDrawer
+      add .translate-x-full
+      remove .open
+    end"
 >
   <div class="flex justify-between items-center mb-6 flex-none">
     <h2 class="text-xl font-bold text-gray-800">Your History</h2>
     <button
-      _="on click send closeDrawer to #historyDrawer"
+      _="on click send closeDrawer to #historyDrawer
+      
+      on click from document
+      if #historyDrawer.classList.contains('open') and not target.closest('#historyDrawer')
+        send closeDrawer to #historyDrawer
+      end
+    end"
       class="text-gray-400 hover:text-red-500"
     >
       <i class="fa-solid fa-xmark text-xl"></i>
@@ -17,7 +31,7 @@
 
   <div
     id="historyList"
-    class="space-y-4 overflow-y-auto flex-1 pr-2"
+    class="space-y-4 overflow-y-auto flex-1"
     _="on renderHistory
          set history to JSON.parse(localStorage.getItem('u_short_history'))
          if history is null or history is '[]'
@@ -28,22 +42,118 @@
            for item in history
              set fragment to #historyTemplate.content.cloneNode(true)
              put item.short into fragment.querySelector('.short-url')
-             put item.original into fragment.querySelector('.original-url')
-             call me.appendChild(fragment)
+             put item.original into fragment.querySelector('.original-url')           
+             set row to fragment.firstElementChild
+             call me.appendChild(row)
            end
+         end
+         
+         on click
+         set btn to target.closest('.copy-btn')
+         if btn
+           set row to btn.closest('.flex')
+           set textToCopy to (row.querySelector('.short-url')).innerText
+           call navigator.clipboard.writeText(textToCopy)
+           call window.notyf.success('Copied to clipboard!')
+           add .hidden to .dropdown
+         end
+         
+         set openBtn to target.closest('.short-url')
+         if openBtn
+           set shortUrl to openBtn.innerText
+           call window.open(shortUrl, '_blank')
+         end
+         
+         set shareBtn to target.closest('.share')
+         if shareBtn
+           set row to shareBtn.closest('.flex')
+           set shortUrl to (row.querySelector('.short-url')).innerText
+           add .hidden to .dropdown
+           
+           if navigator.share
+             call navigator.share({
+               title: 'Shorten Link',
+               text: 'Check out this short link: ',
+               url: shortUrl
+             })
+             log 'Shared successfully'
+           else
+             call Swal.fire({
+               title: 'Share Link',
+               html: `
+                 <div class='flex justify-center gap-6 p-4'>
+                   <a href='https://wa.me/?text=Check out this short link: ${encodeURIComponent(shortUrl)}' target='_blank' class='text-green-500 hover:scale-110 transition-transform'>
+                     <i class='fa-brands fa-whatsapp fa-2xl'></i>
+                   </a>
+                   <a href='https://twitter.com/intent/tweet?url=${encodeURIComponent(shortUrl)}' target='_blank' class='text-blue-400 hover:scale-110 transition-transform'>
+                     <i class='fa-brands fa-twitter fa-2xl'></i>
+                   </a>
+                   <a href='https://t.me/share/url?url=${encodeURIComponent(shortUrl)}' target='_blank' class='text-blue-500 hover:scale-110 transition-transform'>
+                     <i class='fa-brands fa-telegram fa-2xl'></i>
+                   </a>
+                 </div>
+               `,
+               showConfirmButton: false,
+               showCloseButton: true,
+               background: '#1f2937',
+               color: '#fff'
+             })
+           end
+         end
+         
+         set qrBtn to target.closest('.qr-btn')
+         if qrBtn
+           set row to qrBtn.closest('.flex')
+           set shortUrl to (row.querySelector('.short-url')).innerText
+           add .hidden to .dropdown
+           
+           call fetch('/scan', {
+             method: 'POST',
+             headers: {
+               'Content-Type': 'application/x-www-form-urlencoded'
+             },
+             body: 'url=' + encodeURIComponent(shortUrl)
+           })
+           then set response to it
+           then call response.text()
+           then set qrHtml to it
+           call Swal.fire({
+             title: 'QR Code',
+             html: qrHtml,
+             width: 400,
+             showConfirmButton: false,
+             showCloseButton: true
+           })
+         end
+         
+         set optionBtn to target.closest('.option-btn')
+         if optionBtn
+           set row to optionBtn.closest('.flex-col')
+           set menu to row.querySelector('.dropdown')
+ 
+           if menu.matches('.hidden')
+             add .hidden to .dropdown
+             remove .hidden from menu
+           else
+             add .hidden to menu
+           end
+         end
+                 
+         if not target.closest('.option-btn') and not target.closest('.dropdown')
+           add .hidden to .dropdown
          end"
   ></div>
 
   <div
     id="clearHistoryBtn"
-    class="pt-4 mt-4 border-t border-gray-100 flex-none"
+    class="pt-4 mt-4 border-t border-gray-300 flex-none"
   >
     <button
       class="text-red-400 hover:text-red-600 font-semibold text-sm transition-colors w-full text-center"
       _="on click
         call Swal.fire({
           title: 'Are you sure?',
-          text: 'This will delete your local history!',
+          text: 'This will delete your history!',
           showCancelButton: true,
           confirmButtonColor: '#22c55e', 
           cancelButtonColor: '#ef4444', 
@@ -62,8 +172,38 @@
   </div>
 
   <template id="historyTemplate">
-    <div class="flex flex-col">
-      <p class="text-green-500 font-semibold short-url"></p>
+    <div class="flex flex-col border-b border-gray-400 last:border-0 pb-4">
+      <div class="flex justify-between items-center">
+        <p
+          class="text-green-500 font-semibold hover:text-green-600 cursor-pointer short-url"
+        ></p>
+
+        <div class="relative">
+          <button
+            class="option-btn hover:bg-gray-300/80 rounded-full w-6 h-6 cursor-pointer"
+            title="Option"
+          >
+            <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+          </button>
+
+          <div
+            class="dropdown hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow z-50 p-1"
+          >
+            <button
+              class="copy-btn block w-full text-left rounded-lg px-2 py-1 hover:bg-gray-100 text-sm cursor-pointer"
+              >Copy</button
+            >
+            <button
+              class="share block w-full text-left rounded-lg px-2 py-1 hover:bg-gray-100 text-sm cursor-pointer"
+              >Share</button
+            >
+            <button
+              class="qr-btn block w-full text-left rounded-lg px-2 py-1 hover:bg-gray-100 text-sm cursor-pointer"
+              >QR Code</button
+            >
+          </div>
+        </div>
+      </div>
       <p class="text-gray-700 text-sm truncate original-url"></p>
     </div>
   </template>
