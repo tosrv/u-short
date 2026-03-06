@@ -4,26 +4,29 @@
     <h2
       class="text-2xl md:text-7xl font-black text-white italic tracking-tight"
     >
-      Free URL Shortener & <br /><span class="text-green-600">
+      Free URL Shortener & <br /><span class="text-green-500">
         QR Generator
       </span>
     </h2>
-    <p class="text-black font-bold text-lg md:text-2xl">
+    <p class="text-gray-300 font-bold text-lg md:text-2xl">
       Shorten links and generate QR codes instantly — no signup required.
       Secure, fast, and 100% free.
     </p>
   </section>
-  <section
-    id="tab-container"
-    class="backdrop-blur-md rounded-2xl flex flex-col items-center"
-  >
+  <section id="tab-container" class="rounded-2xl flex flex-col items-center">
     <div class="grid grid-cols-2 w-full">
       <span
         id="btn-shorten"
         hx-get="/partials/form-shorten"
         hx-target="#form-area"
-        class="formBtn text-xl font-semibold w-full rounded-t-2xl h-12 border-4 border-green-600 border-b-0 text-center py-2 cursor-pointer"
-        _="on click add .border-b-4 .bg-gray-600 to .formBtn then remove .border-b-4 .bg-gray-600 from me then take .border-b-0 .border-4 from .formBtn"
+        class="formBtn bg-green-100/30 text-green-500 text-xl font-semibold w-full rounded-t-2xl h-12 border-4 border-green-600 border-b-0 text-center py-2 cursor-pointer"
+        _="on click 
+       for el in .formBtn 
+         el.classList.add('bg-gray-600', 'border-b-4')
+         el.classList.remove('bg-green-100/30', 'border-4', 'border-b-0')
+       end
+       me.classList.remove('bg-gray-600', 'border-b-4')
+       me.classList.add('bg-green-100/30', 'border-4', 'border-b-0')"
       >
         <i class="fa-solid fa-link-slash"></i> Shorten
       </span>
@@ -32,15 +35,21 @@
         id="btn-qr"
         hx-get="/partials/form-qr"
         hx-target="#form-area"
-        class="formBtn text-xl font-semibold w-full rounded-t-2xl h-12 bg-gray-600 border-b-4 border-green-600 text-center py-2 cursor-pointer"
-        _="on click add .border-b-4 .bg-gray-600 to .formBtn then remove .border-b-4 .bg-gray-600 from me then take .border-b-0 .border-4 from .formBtn"
+        class="formBtn bg-gray-600 text-green-500 text-xl font-semibold w-full rounded-t-2xl h-12 border-b-4 border-green-600 text-center py-2 cursor-pointer"
+        _="on click 
+       for el in .formBtn 
+         el.classList.add('bg-gray-600', 'border-b-4')
+         el.classList.remove('bg-green-100/30', 'border-4', 'border-b-0')
+       end
+       me.classList.remove('bg-gray-600', 'border-b-4')
+       me.classList.add('bg-green-100/30', 'border-4', 'border-b-0')"
       >
         <i class="fa-solid fa-qrcode"></i> QR Code
       </span>
     </div>
 
     <div
-      class="flex flex-1 items-center justify-center w-full p-4 border-4 border-green-600 border-t-0 rounded-b-2xl min-h-96"
+      class="backdrop-blur-md bg-green-100/30 flex flex-1 items-center justify-center w-full p-4 border-4 border-green-600 border-t-0 rounded-b-2xl min-h-96"
     >
       <div id="form-area" class="w-full px-4">
         {{template "form-shorten" .}}
